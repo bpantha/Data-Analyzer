@@ -16,8 +16,6 @@ import edu.upenn.cit594.datamanagement.CsvCovidFileReader;
 import edu.upenn.cit594.datamanagement.CsvPopulationFileReader;
 import edu.upenn.cit594.datamanagement.CsvPropertyFileReader;
 import edu.upenn.cit594.datamanagement.JsonCovidFileReader;
-import edu.upenn.cit594.datamanagement.JsonCovidFileReader;
-import edu.upenn.cit594.logging.Logger;
 import edu.upenn.cit594.util.CovidData;
 import edu.upenn.cit594.util.Population;
 import edu.upenn.cit594.util.Property;
@@ -29,123 +27,18 @@ public class Processor implements Averages {
 	List<CovidData> covidDatas;
 
 	// memoization
+	String[] dataSets;
 	int totalPopulationForAllZipCodes;
 	private Map<Integer, Integer> zipsAndPopulations;
 	private Map<Integer, Double> avgMarketValue;
 	private Map<Integer, Double> totalMarketValue;
 	private Map<Integer, Double> avgTotalLivableArea;
 	private Map<Integer, Double> totalMktValuePerCapita;
-	// partially vaccinated results
 	private Set<String> fullVaxDates;
-	public List<CovidData> getCovidDatas() {
-		return covidDatas;
-	}
-
-	public void setCovidDatas(List<CovidData> covidDatas) {
-		this.covidDatas = covidDatas;
-	}
-
-	public Map<Integer, Double> getAvgMarketValue() {
-		return avgMarketValue;
-	}
-
-	public void setAvgMarketValue(Map<Integer, Double> avgMarketValue) {
-		this.avgMarketValue = avgMarketValue;
-	}
-
-	public Map<Integer, Double> getAvgTotalLivableArea() {
-		return avgTotalLivableArea;
-	}
-
-	public void setAvgTotalLivableArea(Map<Integer, Double> avgTotalLivableArea) {
-		this.avgTotalLivableArea = avgTotalLivableArea;
-	}
-
-	public Map<Integer, Double> getTotalMktValuePerCapita() {
-		return totalMktValuePerCapita;
-	}
-
-	public void setTotalMktValuePerCapita(Map<Integer, Double> totalMktValuePerCapita) {
-		this.totalMktValuePerCapita = totalMktValuePerCapita;
-	}
-
-	public Set<String> getFullVaxDates() {
-		return fullVaxDates;
-	}
-
-	public void setFullVaxDates(Set<String> fullVaxDates) {
-		this.fullVaxDates = fullVaxDates;
-	}
-
-	public Map<String, Map<Integer, Double>> getTotalPartialVaccinationsPerCapita() {
-		return totalPartialVaccinationsPerCapita;
-	}
-
-	public void setTotalPartialVaccinationsPerCapita(Map<String, Map<Integer, Double>> totalPartialVaccinationsPerCapita) {
-		this.totalPartialVaccinationsPerCapita = totalPartialVaccinationsPerCapita;
-	}
-
-	public Map<String, Map<Integer, Double>> getTotalFullVaccinationsPerCapita() {
-		return totalFullVaccinationsPerCapita;
-	}
-
-	public void setTotalFullVaccinationsPerCapita(Map<String, Map<Integer, Double>> totalFullVaccinationsPerCapita) {
-		this.totalFullVaccinationsPerCapita = totalFullVaccinationsPerCapita;
-	}
-
-	public Map<Integer, Double> getT10VaxPerCapita() {
-		return t10VaxPerCapita;
-	}
-
-	public void setT10VaxPerCapita(Map<Integer, Double> t10VaxPerCapita) {
-		this.t10VaxPerCapita = t10VaxPerCapita;
-	}
-
-	public CsvPopulationFileReader getPopulationReader() {
-		return populationReader;
-	}
-
-	public void setPopulationReader(CsvPopulationFileReader populationReader) {
-		this.populationReader = populationReader;
-	}
-
-	public CsvPropertyFileReader getPropertyReader() {
-		return propertyReader;
-	}
-
-	public void setPropertyReader(CsvPropertyFileReader propertyReader) {
-		this.propertyReader = propertyReader;
-	}
-
-	public CsvCovidFileReader getCovidReader() {
-		return covidReader;
-	}
-
-	public void setCovidReader(CsvCovidFileReader covidReader) {
-		this.covidReader = covidReader;
-	}
-
-
-	public String[] getDataSets() {
-		return dataSets;
-	}
-
-	public void setDataSets(String[] dataSets) {
-		this.dataSets = dataSets;
-	}
-
-	public void setPopulations(List<Population> populations) {
-		this.populations = populations;
-	}
-
-
 	Map<String, Map<Integer, Double>> totalPartialVaccinationsPerCapita;
-	// fully vaccinated results
 	Map<String, Map<Integer, Double>> totalFullVaccinationsPerCapita;
-	
 	// vaccination rates per capita for top 10 richest neighborhoods
 	private Map<Integer, Double> t10VaxPerCapita;
-	// vaccination rates per capita for bottom 10 richest neighborhoods
 	
 	// readers
 	CsvPopulationFileReader populationReader;
@@ -153,37 +46,31 @@ public class Processor implements Averages {
 	CsvCovidFileReader covidReader;
 	JsonCovidFileReader js;
 	
-	String[] dataSets;
-	
-	public boolean isPopulationAllowed() {
-		return populationAllowed;
-	}
-
-	public void setPopulationAllowed(boolean populationAllowed) {
-		this.populationAllowed = populationAllowed;
-	}
-
-	public boolean isPropertyAllowed() {
-		return propertyAllowed;
-	}
-
-	public void setPropertyAllowed(boolean propertyAllowed) {
-		this.propertyAllowed = propertyAllowed;
-	}
-
-	public boolean isCovidAllowed() {
-		return covidAllowed;
-	}
-
-	public void setCovidAllowed(boolean covidAllowed) {
-		this.covidAllowed = covidAllowed;
-	}
-	
 
 	boolean populationAllowed = false;
 	boolean propertyAllowed = false;
 	boolean covidAllowed = false;
+
+
+	public boolean isPopulationAllowed() {
+		return populationAllowed;
+	}
+	public boolean isPropertyAllowed() {
+		return propertyAllowed;
+	}
+	public boolean isCovidAllowed() {
+		return covidAllowed;
+	}
 	
+	/**
+	 * Processor constructor checks if the given files are null or empty and 
+	 * initializes the data readers based on which datasets are available. Also 
+	 * stores each file name and outputs it to the dataSet array 
+	 * @param populationFile
+	 * @param propertyFile
+	 * @param covidFile
+	 * @param json
+	 */
 	public Processor(String populationFile, String propertyFile, String covidFile, boolean json) {
 		if (!json) {
 			String aData = "";
@@ -242,11 +129,12 @@ public class Processor implements Averages {
 			this.dataSets = aData.split(",");
 		}
 		
-		
 		initialize();
 	}
 	
-	// initialization
+	/**
+	 * initializes the hashmaps for memoization based on which datasets are available
+	 */
 	public void initialize() {
 		// 3.2
 		if (this.populationAllowed) {
@@ -264,9 +152,7 @@ public class Processor implements Averages {
 		
 		if (this.propertyAllowed) {
 			this.avgMarketValue = initAvgMktValue();
-			
 			this.avgTotalLivableArea = initAvgTotalLivableArea();
-			
 			if(this.populationAllowed) {
 				this.totalMktValuePerCapita = initTotalMktValuePerCapita();	
 			}
@@ -277,19 +163,55 @@ public class Processor implements Averages {
 		}
 		
 	}
-
-	//3.1 
-	public void availableDataSets() {
-		Arrays.sort(this.dataSets);
+	/**
+	 * prints to the console to signify the start of the output
+	 */
+	public void beginOutput(){
 		System.out.println("");
 		System.out.println("BEGIN OUTPUT");
+
+	}
+	/**
+	 *  prints to the console to signify the end of the output
+	 */
+	public void endOutput(){
+		System.out.println("END OUTPUT");
+	}
+
+	/**
+	 *  prints to the console if a given output is zero
+	 */
+	public void zeroOutput(){
+		System.out.println("");
+		System.out.println("BEGIN OUTPUT");
+		System.out.println(0);
+		System.out.println("END OUTPUT");
+	}
+
+	public void fileNotAvailableOutput(){
+		System.out.println("");
+		System.out.println("BEGIN OUTPUT");
+		System.out.println("Sorry, the files were not available.");	
+		System.out.println("END OUTPUT");
+	}	
+	//3.1 
+	/**
+	 * iterates through each data set in this.datSets and prints to console each dataset
+	 */
+	public void availableDataSets() {
+		Arrays.sort(this.dataSets);
+		beginOutput();
 		for(String d: dataSets) {
 			System.out.println(d);
 		}
-		System.out.println("END OUTPUT");
+		endOutput();
 		
 	}
 	
+	/**
+	 * sums up values in zipsAndPopulations hashmap
+	 * @return
+	 */
 	public int totalPopAllZip() {
 		int tot = 0;
 		for(int pop: this.getZipsAndPopulations().values()) {
@@ -299,11 +221,16 @@ public class Processor implements Averages {
 		this.totalPopulationForAllZipCodes = tot;
 		return tot;
 		
-		
 	}
 	
 	//3.2 
+	/**
+	 * If the user enters a 2 at the main menu, the program should display 
+	 * the total population for all of the ZIP Codes in the population input file .
+	 * @return zipsAndPopulations hashmap to initialize the memoized hashmap
+	 */
 	public Map<Integer, Integer> zipPop() {
+		// hashmap to memoize zipcode and its given population
 		Map<Integer, Integer> zipsAndPopulations = new HashMap<>();
 		for (Population p: populations) {
 			if(p.getZipCode() != 0 && p.getPopulation() != 0) {
@@ -316,13 +243,18 @@ public class Processor implements Averages {
 	
 	//3.3
 	
-	//partially vaccinated
+	/**
+	 * Store the partial vaxinated dates in a set for quick acess
+	 * @return set of dates for partial vaccinations
+	 */
 	
 	public Set<String> initPartialVaxDates() {
 		 Set<String> datesSet = new HashSet<>();
 		 for(CovidData c: this.covidDatas) {
 			 if(c != null) {
 				 if (c.getPartiallyVaccinated() != 0.0) {
+					// add date to the set by splitting the given etl_timestamp and only taking the first element 
+					// which is the formated date "yyyy-mm-dd"
 					 datesSet.add(c.getTimeStamp().split(" ")[0]);
 				 }
 			 }
@@ -330,6 +262,13 @@ public class Processor implements Averages {
 		 return datesSet;
 	}
 	
+	/**
+	 * Iterate thorugh covid object and for each non zero partial vaccination for 
+	 * each date, updates the vaxPerCapita hashmap. Additionally checks if the 
+	 * population for a given zipcode is 0. If so, ignores the zipcode.
+	 * @return hashMap conatining the date as they key and the value as a hashmap 
+	 * of zipcode as the key and the partial vaccinations per capita as the value
+	 */
 	public Map<String, Map<Integer, Double>> initPartialVaccinationsPerCapita(){
 		Map<String, Map<Integer, Double>> vaxPerCapita = new HashMap<>();
 		
@@ -367,6 +306,14 @@ public class Processor implements Averages {
 		 }
 		 return datesSet;
 	}
+
+	/**
+	 * Iterate thorugh covid object and for each non zero full vaccination for 
+	 * each date, updates the fullVaxPerCapita hashmap. Additionally checks if the 
+	 * population for a given zipcode is 0. If so, ignores the zipcode.
+	 * @return hashMap conatining the date as they key and the value as a hashmap 
+	 * of zipcode as the key and the partial vaccinations per capita as the value
+	 */
 	
 	public Map<String, Map<Integer, Double>> initFullVaccinationsPerCapita() {
 		Map<String, Map<Integer, Double>> fullVaxPerCapita = new HashMap<>();
@@ -393,6 +340,12 @@ public class Processor implements Averages {
 			return fullVaxPerCapita;
 
 		}
+
+	/**
+	 * prints output of partial or full vax per capita to the console
+	 * @param data resulting hashmap from date specified by user input from the 
+	 * memoized hashmap of partial for full vaccination for a given date
+	 */
 
 	public void printVaxPerCapita(Map<Integer, Double> data) {
 		System.out.println("");
@@ -700,6 +653,120 @@ public class Processor implements Averages {
 		totalMVpC = totalMV/population;
 		
 		return (int) totalMVpC;
+	}
+
+	public List<CovidData> getCovidDatas() {
+		return covidDatas;
+	}
+
+	public void setCovidDatas(List<CovidData> covidDatas) {
+		this.covidDatas = covidDatas;
+	}
+
+	public Map<Integer, Double> getAvgMarketValue() {
+		return avgMarketValue;
+	}
+
+	public void setAvgMarketValue(Map<Integer, Double> avgMarketValue) {
+		this.avgMarketValue = avgMarketValue;
+	}
+
+	public Map<Integer, Double> getAvgTotalLivableArea() {
+		return avgTotalLivableArea;
+	}
+
+	public void setAvgTotalLivableArea(Map<Integer, Double> avgTotalLivableArea) {
+		this.avgTotalLivableArea = avgTotalLivableArea;
+	}
+
+	public Map<Integer, Double> getTotalMktValuePerCapita() {
+		return totalMktValuePerCapita;
+	}
+
+	public void setTotalMktValuePerCapita(Map<Integer, Double> totalMktValuePerCapita) {
+		this.totalMktValuePerCapita = totalMktValuePerCapita;
+	}
+
+	public Set<String> getFullVaxDates() {
+		return fullVaxDates;
+	}
+
+	public void setFullVaxDates(Set<String> fullVaxDates) {
+		this.fullVaxDates = fullVaxDates;
+	}
+
+	public Map<String, Map<Integer, Double>> getTotalPartialVaccinationsPerCapita() {
+		return totalPartialVaccinationsPerCapita;
+	}
+
+	public void setTotalPartialVaccinationsPerCapita(Map<String, Map<Integer, Double>> totalPartialVaccinationsPerCapita) {
+		this.totalPartialVaccinationsPerCapita = totalPartialVaccinationsPerCapita;
+	}
+
+	public Map<String, Map<Integer, Double>> getTotalFullVaccinationsPerCapita() {
+		return totalFullVaccinationsPerCapita;
+	}
+
+	public void setTotalFullVaccinationsPerCapita(Map<String, Map<Integer, Double>> totalFullVaccinationsPerCapita) {
+		this.totalFullVaccinationsPerCapita = totalFullVaccinationsPerCapita;
+	}
+
+	public Map<Integer, Double> getT10VaxPerCapita() {
+		return t10VaxPerCapita;
+	}
+
+	public void setT10VaxPerCapita(Map<Integer, Double> t10VaxPerCapita) {
+		this.t10VaxPerCapita = t10VaxPerCapita;
+	}
+
+	public CsvPopulationFileReader getPopulationReader() {
+		return populationReader;
+	}
+
+	public void setPopulationReader(CsvPopulationFileReader populationReader) {
+		this.populationReader = populationReader;
+	}
+
+	public CsvPropertyFileReader getPropertyReader() {
+		return propertyReader;
+	}
+
+	public void setPropertyReader(CsvPropertyFileReader propertyReader) {
+		this.propertyReader = propertyReader;
+	}
+
+	public CsvCovidFileReader getCovidReader() {
+		return covidReader;
+	}
+
+	public void setCovidReader(CsvCovidFileReader covidReader) {
+		this.covidReader = covidReader;
+	}
+
+
+	public String[] getDataSets() {
+		return dataSets;
+	}
+
+	public void setDataSets(String[] dataSets) {
+		this.dataSets = dataSets;
+	}
+
+	public void setPopulations(List<Population> populations) {
+		this.populations = populations;
+	}
+	public void setPopulationAllowed(boolean populationAllowed) {
+		this.populationAllowed = populationAllowed;
+	}
+	
+	public void setPropertyAllowed(boolean propertyAllowed) {
+		this.propertyAllowed = propertyAllowed;
+	}
+
+	
+
+	public void setCovidAllowed(boolean covidAllowed) {
+		this.covidAllowed = covidAllowed;
 	}
 }
 	

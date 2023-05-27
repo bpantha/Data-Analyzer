@@ -1,9 +1,7 @@
 package edu.upenn.cit594;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 
 import edu.upenn.cit594.logging.Logger;
 import edu.upenn.cit594.processor.Processor;

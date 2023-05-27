@@ -1,8 +1,4 @@
 package edu.upenn.cit594.ui;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -59,16 +55,10 @@ public class UserInterface {
 			
 			else if (Integer.parseInt(userInput) == 2) {
 				if (p.isPopulationAllowed()) {
-					System.out.println("");
-					System.out.println("BEGIN OUTPUT");
 					System.out.println(p.getTotalPopulationForAllZipCodes());
-					System.out.println("END OUTPUT");
 				}
 				else {
-					System.out.println("");
-					System.out.println("BEGIN OUTPUT");
-					System.out.println("Sorry, the files were not available.");	
-					System.out.println("END OUTPUT");
+					p.fileNotAvailableOutput();
 				}
 			}
 			
@@ -105,10 +95,7 @@ public class UserInterface {
 								p.printVaxPerCapita(partial.get(userInput));
 							}
 							else {
-								System.out.println("");
-								System.out.println("BEGIN OUTPUT");
-								System.out.println(0);
-								System.out.println("END OUTPUT");
+								p.zeroOutput();
 							}
 						}
 						else if (answer.trim().equalsIgnoreCase("full")){
@@ -117,19 +104,13 @@ public class UserInterface {
 								p.printVaxPerCapita(full.get(userInput));
 							}
 							else {
-								System.out.println("");
-								System.out.println("BEGIN OUTPUT");
-								System.out.println(0);
-								System.out.println("END OUTPUT");
+								p.zeroOutput();;
 							}
 					}
 					}					
 				}
 				else {
-					System.out.println("");
-					System.out.println("BEGIN OUTPUT");
-					System.out.println("Sorry, the files were not available.");	
-					System.out.println("END OUTPUT");
+					p.fileNotAvailableOutput();
 
 				}
 				
@@ -149,10 +130,7 @@ public class UserInterface {
 					p.printAvgMktValue(Integer.parseInt(userInput));
 				}
 				else {
-					System.out.println("");
-					System.out.println("BEGIN OUTPUT");
-					System.out.println("Sorry, the files were not available.");	
-					System.out.println("END OUTPUT");
+					p.fileNotAvailableOutput();
 				}
 				
 			}
@@ -168,10 +146,7 @@ public class UserInterface {
 					p.printAvgTotalLivableArea(Integer.parseInt(userInput));
 				}
 				else {
-					System.out.println("");
-					System.out.println("BEGIN OUTPUT");
-					System.out.println("Sorry, the files were not available.");	
-					System.out.println("END OUTPUT");
+					p.fileNotAvailableOutput();
 				}
 				
 			}
@@ -190,10 +165,7 @@ public class UserInterface {
 					}
 				}
 				else {
-					System.out.println("");
-					System.out.println("BEGIN OUTPUT");
-					System.out.println("Sorry, the files were not available.");	
-					System.out.println("END OUTPUT");
+					p.fileNotAvailableOutput();
 				}
 
 				
@@ -218,10 +190,7 @@ public class UserInterface {
 					
 				}
 				else {
-					System.out.println("");
-					System.out.println("BEGIN OUTPUT");
-					System.out.println("Sorry, the files were not available.");	
-					System.out.println("END OUTPUT");
+					p.fileNotAvailableOutput();
 				}
 				
 			}

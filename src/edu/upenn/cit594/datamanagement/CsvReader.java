@@ -8,7 +8,7 @@ import java.util.List;
 
 public abstract class CsvReader<E> {
 	
-	String fileName;
+	String fileName; 
 	
 	public CsvReader(String fileName) {
 		this.fileName = fileName;

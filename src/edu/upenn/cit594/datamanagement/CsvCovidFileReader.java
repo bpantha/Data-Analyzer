@@ -2,12 +2,11 @@ package edu.upenn.cit594.datamanagement;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import edu.upenn.cit594.logging.Logger;
 import edu.upenn.cit594.util.CovidData;
-import edu.upenn.cit594.util.Population;
+
 
 public class CsvCovidFileReader extends CsvReader<Object> implements CovidReader{
 	
