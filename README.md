@@ -3,7 +3,7 @@
 ## Overview 
 **Using design principles, and design patterns, developed a Java application that read text files as input and performs some analysis.**
 
-## Desing Specification 
+## Design Specification 
   - UML class diagram
   - N-tier architecture
   - Singleton and strategy pattern
